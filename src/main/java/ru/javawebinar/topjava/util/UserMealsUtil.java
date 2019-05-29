@@ -25,10 +25,10 @@ public class UserMealsUtil {
     }
 
     public static List<UserMealWithExceed> getFilteredWithExceeded(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
-        // TODO return filtered list with correctly exceeded field
+
         List<UserMealWithExceed> listUserMealWithExceed = new ArrayList<>(); // список еды который нужно вернуть
 
-        Map<LocalDate, Integer> summCaloriesPerDay = new HashMap<LocalDate, Integer>(); //карта всех возможных дат и сумм каллорий по датам.
+        Map<LocalDate, Integer> summCaloriesPerDay = new HashMap<>(); //карта всех возможных дат и сумм каллорий по датам.
 
         for (UserMeal userMeal : mealList) { //вычисляем полное количество калорий за каждый день
             if (summCaloriesPerDay.get(userMeal.getDateTime().toLocalDate()) == null) {
@@ -41,7 +41,7 @@ public class UserMealsUtil {
 
         for (UserMeal userMeal : mealList) { // добавляем в список UserMealWithExceed между startTime и endTime в дни обжорства
 
-            if (new TimeUtil().isBetween(userMeal.getDateTime().toLocalTime(), startTime, endTime) && summCaloriesPerDay.get(userMeal.getDateTime().toLocalDate()) > caloriesPerDay) {
+            if (TimeUtil.isBetween(userMeal.getDateTime().toLocalTime(), startTime, endTime) && summCaloriesPerDay.get(userMeal.getDateTime().toLocalDate()) > caloriesPerDay) {
                 listUserMealWithExceed.add(new UserMealWithExceed(userMeal.getDateTime(), userMeal.getDescription(), userMeal.getCalories(), true));
             }
         }
