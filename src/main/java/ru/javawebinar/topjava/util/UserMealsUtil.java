@@ -35,7 +35,7 @@ public class UserMealsUtil {
 
         List<UserMealWithExceed> listUserMealWithExceed = new ArrayList<>();
 
-        mealList.forEach((u) -> { // добавляем в список UserMealWithExceed между startTime и endTime
+        mealList.forEach((u) -> {
             if (TimeUtil.isBetween(u.getDateTime().toLocalTime(), startTime, endTime)) {
                 listUserMealWithExceed.add(new UserMealWithExceed(u.getDateTime(), u.getDescription(), u.getCalories(), (summCaloriesPerDay.get(u.getDateTime().toLocalDate()) > caloriesPerDay)));
             }
