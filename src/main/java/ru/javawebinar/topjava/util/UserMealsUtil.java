@@ -27,14 +27,13 @@ public class UserMealsUtil {
 //        .toLocalTime();
     }
 
-    //вариант через циклы
     public static List<UserMealWithExceed> getFilteredWithExceeded(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
 
-        Map<LocalDate, Integer> summCaloriesPerDay = new HashMap<>(); //карта всех возможных дат и сумм каллорий по датам.
+        Map<LocalDate, Integer> summCaloriesPerDay = new HashMap<>();
 
-        mealList.forEach((userMeal) -> summCaloriesPerDay.merge(userMeal.getDateTime().toLocalDate(), userMeal.getCalories(), (v, nv) -> v + nv));
+        mealList.forEach((userMeal) -> summCaloriesPerDay.merge(userMeal.getDateTime().toLocalDate(), userMeal.getCalories(), Integer::sum));
 
-        List<UserMealWithExceed> listUserMealWithExceed = new ArrayList<>(); // список еды который нужно вернуть
+        List<UserMealWithExceed> listUserMealWithExceed = new ArrayList<>();
 
         mealList.forEach((u) -> { // добавляем в список UserMealWithExceed между startTime и endTime
             if (TimeUtil.isBetween(u.getDateTime().toLocalTime(), startTime, endTime)) {
@@ -45,10 +44,9 @@ public class UserMealsUtil {
         return listUserMealWithExceed;
     }
 
-    // вариант через stream()
     public static List<UserMealWithExceed> getFilteredWithExceeded_1(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
 
-        Map<LocalDate, Integer> summCaloriesPerDay = mealList.stream().collect(Collectors.toMap((u) -> u.getDateTime().toLocalDate(), (u) -> u.getCalories(), (v, nv) -> v + nv));
+        Map<LocalDate, Integer> summCaloriesPerDay = mealList.stream().collect(Collectors.toMap((u) -> u.getDateTime().toLocalDate(), UserMeal::getCalories, Integer::sum));
 
         return mealList.stream()
                 .filter(u -> TimeUtil.isBetween(u.getDateTime().toLocalTime(), startTime, endTime))
