@@ -19,6 +19,7 @@ public abstract class AbstractUserController {
 
     public List<User> getAll() {
         log.info("getAll");
+
         return service.getAll();
     }
 
