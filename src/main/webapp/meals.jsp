@@ -21,6 +21,29 @@
     <h3><a href="index.html">Home</a></h3>
     <hr/>
     <h2>Meals</h2>
+    <p>
+    <form method="GET" enctype="application/x-www-form-urlencoded">
+        <table>
+            <tr>
+                <td>От даты</td>
+                <td>До даты</td>
+                <td>От времени</td>
+                <td>До времени</td>
+            </tr>
+            <tr>
+                <td><input type="date" name="minD" value="${minDate}" required></td>
+                <td><input type="date" name="maxD" value="${maxDate}" required></td>
+                <td><input type="time" name="minT" value="${minTime}" required></td>
+                <td><input type="time" name="maxT" value="${maxTime}" required></td>
+                <td><input type="hidden" name="action" value="filter" ></td>
+             </tr>
+        </table>
+
+        <input type="submit" value="Фильтровать">
+    </form>
+
+    </p>
+
     <a href="meals?action=create">Add Meal</a>
     <br><br>
     <table border="1" cellpadding="8" cellspacing="0">

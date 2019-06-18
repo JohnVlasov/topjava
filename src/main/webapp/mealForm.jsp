@@ -3,7 +3,7 @@
 
 <html>
 <head>
-    <title>Meal</title>
+    <title>Meal    </title>
     <style>
         dl {
             background: none repeat scroll 0 0 #FAFAFA;

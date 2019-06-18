@@ -6,9 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 
-import java.util.Collection;
+import java.util.List;
 
-import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 
@@ -18,9 +17,9 @@ public abstract class AbstractMealController {
     @Autowired
     private MealService service;
 
-    public Collection<Meal> getAll(){
+    public List<Meal> getAll() {
         log.info("getAll");
-          return service.getAll(authUserId());
+        return service.getAll(authUserId());
     }
 
     public Meal get(int id) {
@@ -30,8 +29,7 @@ public abstract class AbstractMealController {
 
     public Meal create(Meal meal) {
         log.info("create {}", meal);
-        checkNew(meal);
-        return service.create(meal);
+        return service.create(meal, authUserId());
     }
 
     public void delete(int id) {
@@ -40,8 +38,7 @@ public abstract class AbstractMealController {
     }
 
     public void update(Meal meal) {
-        log.info("update {} with id={}", meal, authUserId());
-        assureIdConsistent(meal, authUserId());
+        log.info("update {}", meal);
         service.update(meal, authUserId());
     }
 
