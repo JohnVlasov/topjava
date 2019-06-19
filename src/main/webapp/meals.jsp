@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://topjava.javawebinar.ru/functions" %>
-<%--<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>--%>
+
 <html>
 <head>
     <title>Meal list</title>
@@ -31,10 +31,10 @@
                 <td>До времени</td>
             </tr>
             <tr>
-                <td><input type="date" name="minD" value="${minDate}" required></td>
-                <td><input type="date" name="maxD" value="${maxDate}" required></td>
-                <td><input type="time" name="minT" value="${minTime}" required></td>
-                <td><input type="time" name="maxT" value="${maxTime}" required></td>
+                <td><input type="date" name="minD" value="${param.minD}" ></td>
+                <td><input type="date" name="maxD" value="${param.maxD}" ></td>
+                <td><input type="time" name="minT" value="${param.minT}" ></td>
+                <td><input type="time" name="maxT" value="${param.maxT}" ></td>
                 <td><input type="hidden" name="action" value="filter" ></td>
              </tr>
         </table>

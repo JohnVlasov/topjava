@@ -23,23 +23,23 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static ru.javawebinar.topjava.util.DateTimeUtil.isBetween;
-import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
-
 public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
 
-
+    ConfigurableApplicationContext appCtx;
     private MealRestController mealRestController;
 
-    //private MealRepository repository;
+    private LocalDate minDate;
+    private LocalDate maxDate;
+    private LocalTime minTime;
+    private LocalTime maxTime;
+
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml");
+        appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml");
         mealRestController = appCtx.getBean(MealRestController.class);
-        //repository = new InMemoryMealRepositoryImpl();
     }
 
     @Override
@@ -51,10 +51,13 @@ public class MealServlet extends HttpServlet {
         Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
                 LocalDateTime.parse(request.getParameter("dateTime")),
                 request.getParameter("description"),
-                Integer.parseInt(request.getParameter("calories")), authUserId());
+                Integer.parseInt(request.getParameter("calories")), null);
 
         log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
-        mealRestController.create(meal);
+
+        if (meal.isNew()) mealRestController.create(meal);
+        else mealRestController.update(meal);
+
         response.sendRedirect("meals");
     }
 
@@ -72,54 +75,44 @@ public class MealServlet extends HttpServlet {
             case "create":
             case "update":
                 final Meal meal = "create".equals(action) ?
-                        new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000, authUserId()) :
+                        new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000, null) :
                         mealRestController.get(getId(request));
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
                 break;
             case "filter":
-                LocalDate minDate = LocalDate.parse(request.getParameter("minD"));
-                LocalDate maxDate = LocalDate.parse(request.getParameter("maxD"));
-                LocalTime minTime = LocalTime.parse(request.getParameter("minT"));
-                LocalTime maxTime = LocalTime.parse(request.getParameter("maxT"));
 
-                request.setAttribute("minDate", minDate);
-                request.setAttribute("maxDate", maxDate);
-                request.setAttribute("minTime", minTime);
-                request.setAttribute("maxTime", maxTime);
+                if (request.getParameter("minD").equals("")) minDate = LocalDate.MIN;
+                else minDate = LocalDate.parse(request.getParameter("minD"));
 
+                if (request.getParameter("maxD").equals("")) maxDate = LocalDate.MAX;
+                else maxDate = LocalDate.parse(request.getParameter("maxD"));
+
+                if (request.getParameter("minT").equals("")) minTime = LocalTime.MIN;
+                else minTime = LocalTime.parse(request.getParameter("minT"));
+
+                if (request.getParameter("maxT").equals("")) maxTime = LocalTime.MAX;
+                else maxTime = LocalTime.parse(request.getParameter("maxT"));
 
                 log.info("getAll Filtered");
 
-                List<MealTo> list = MealsUtil.getWithExcess(mealRestController.getAll(), MealsUtil.DEFAULT_CALORIES_PER_DAY);
-
-                List<MealTo> listDT = list.stream()
-                        .filter(mealTo -> mealTo.getDateTime().toLocalDate().compareTo(minDate) >= 0)
-                        .filter(mealTo -> mealTo.getDateTime().toLocalDate().compareTo(maxDate) <= 0)
-                        .filter(mealTo -> mealTo.getDateTime().toLocalTime().compareTo(minTime) >= 0)
-                        .filter(mealTo -> mealTo.getDateTime().toLocalTime().compareTo(maxTime) <= 0)
-                        .collect(Collectors.toList());
-
-                request.setAttribute("meals", listDT);
-
-
+                request.setAttribute("meals", mealRestController.getAll(minDate,maxDate,minTime,maxTime));
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
-
-
                 break;
+
             case "all":
             default:
                 log.info("getAll");
-                request.setAttribute("meals", MealsUtil.getWithExcess(mealRestController.getAll(), MealsUtil.DEFAULT_CALORIES_PER_DAY));
-
-                request.setAttribute("minDate", mealRestController.minDate());
-                request.setAttribute("maxDate", mealRestController.maxDate());
-                request.setAttribute("minTime", mealRestController.minTime());
-                request.setAttribute("maxTime", mealRestController.maxTime());
-
+                request.setAttribute("meals", mealRestController.getAll(LocalDate.MIN,LocalDate.MAX,LocalTime.MIN, LocalTime.MAX));
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
         }
+    }
+
+    @Override
+    public void destroy() {
+        appCtx.close();
+        super.destroy();
     }
 
     private int getId(HttpServletRequest request) {

@@ -18,12 +18,12 @@ import static java.util.stream.Collectors.toList;
 
 public class MealsUtil {
     public static final List<Meal> MEALS = Arrays.asList(
-            new Meal(LocalDateTime.of(2018, Month.MAY, 30, 10, 0), "Завтрак", 500 ,2),
-            new Meal(LocalDateTime.of(2018, Month.MAY, 30, 13, 0), "Обед", 1000,2),
-            new Meal(LocalDateTime.of(2018, Month.MAY, 30, 20, 0), "Ужин", 500,2),
-            new Meal(LocalDateTime.of(2015, Month.MAY, 31, 10, 0), "Завтрак", 1000,1),
-            new Meal(LocalDateTime.of(2015, Month.MAY, 31, 13, 0), "Обед", 500,1),
-            new Meal(LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин", 510,1)
+            new Meal(LocalDateTime.of(2018, Month.MAY, 30, 10, 0), "Завтрак Пети", 500 ,2),
+            new Meal(LocalDateTime.of(2018, Month.MAY, 30, 13, 0), "Обед Пети", 1000,2),
+            new Meal(LocalDateTime.of(2018, Month.MAY, 30, 20, 0), "Ужин Пети", 500,2),
+            new Meal(LocalDateTime.of(2015, Month.MAY, 31, 10, 0), "Завтрак Васи", 1000,1),
+            new Meal(LocalDateTime.of(2015, Month.MAY, 31, 13, 0), "Обед Васи", 500,1),
+            new Meal(LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин Васи", 510,1)
     );
 
     public static final int DEFAULT_CALORIES_PER_DAY = 2000;
@@ -48,6 +48,8 @@ public class MealsUtil {
                 .map(meal -> createWithExcess(meal, caloriesSumByDate.get(meal.getDate()) > caloriesPerDay))
                 .collect(toList());
     }
+
+
 
     private static MealTo createWithExcess(Meal meal, boolean excess) {
         return new MealTo(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);

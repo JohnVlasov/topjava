@@ -20,9 +20,9 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryUserRepositoryImpl.class);
 
     public static final List<User> USERS = Arrays.asList(
-            new User(1, "Vasya","vasya@mail.ru", "qwerty", ROLE_USER),
-            new User(2, "Petya","petya@mail.ru", "12345", ROLE_USER),
-            new User(3, "John","john@mail.ru", "12345", ROLE_ADMIN, ROLE_USER)
+            new User(1, "Vasya", "vasya@mail.ru", "qwerty", ROLE_USER),
+            new User(2, "Petya", "petya@mail.ru", "12345", ROLE_USER),
+            new User(3, "John", "john@mail.ru", "12345", ROLE_ADMIN, ROLE_USER)
     );
 
 
@@ -68,8 +68,11 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     @Override
     public User getByEmail(String email) {
         log.info("getByEmail {}", email);
-        return repository.values()
+        try{return repository.values()
                 .stream().filter(u -> u.getEmail().equalsIgnoreCase(email))
-                .findFirst().get();
+                .findFirst().get();}
+        catch (NoSuchElementException e)
+        { return null;
+        }
     }
 }
