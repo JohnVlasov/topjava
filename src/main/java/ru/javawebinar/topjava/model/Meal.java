@@ -1,27 +1,50 @@
 package ru.javawebinar.topjava.model;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+
+
 public class Meal extends AbstractBaseEntity {
-    private final LocalDateTime dateTime;
 
-    private final String description;
+    private LocalDateTime dateTime;
+    private String description;
+    private int calories;
 
-    private final int calories;
+    public Meal()
+    {
+        id = 0;
+        dateTime = LocalDateTime.now();
+        description = "test food";
+        calories = 1000;
+    }
 
     public Meal(LocalDateTime dateTime, String description, int calories) {
         this(null, dateTime, description, calories);
     }
 
     public Meal(Integer id, LocalDateTime dateTime, String description, int calories) {
-        super(id);
-        this.dateTime = dateTime;
-        this.description = description;
-        this.calories = calories;
+    super(id);
+    this.dateTime = dateTime;
+    this.description = description;
+    this.calories = calories;
     }
 
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setCalories(int calories) {
+        this.calories = calories;
+    }
     public LocalDateTime getDateTime() {
         return dateTime;
     }
@@ -45,10 +68,10 @@ public class Meal extends AbstractBaseEntity {
     @Override
     public String toString() {
         return "Meal{" +
-                "id=" + id +
-                ", dateTime=" + dateTime +
+                "dateTime=" + dateTime +
                 ", description='" + description + '\'' +
                 ", calories=" + calories +
+                ", id=" + id +
                 '}';
     }
 }
