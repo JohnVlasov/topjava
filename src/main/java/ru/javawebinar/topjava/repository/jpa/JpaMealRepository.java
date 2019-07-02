@@ -20,7 +20,7 @@ public class JpaMealRepository implements MealRepository {
     @Transactional
     public Meal save(Meal meal, int userId) {
 
-        User user = em.find(User.class, userId);
+        User user = em.getReference(User.class, userId);
         meal.setUser(user);
         if (meal.isNew()) {
             em.persist(meal);
@@ -36,7 +36,7 @@ public class JpaMealRepository implements MealRepository {
     @Override
     @Transactional
     public boolean delete(int id, int userId) {
-        return em.createQuery("DELETE FROM Meal m WHERE m.user.id=:user_id AND m.id=:id")
+        return em.createNamedQuery(Meal.DELETE)
                 .setParameter("user_id", userId)
                 .setParameter("id", id)
                 .executeUpdate() != 0;
@@ -45,7 +45,7 @@ public class JpaMealRepository implements MealRepository {
     @Override
     @Transactional
     public Meal get(int id, int userId) {
-        return em.createQuery("SELECT m FROM Meal m JOIN FETCH m.user WHERE m.user.id=:user_id AND m.id=:id", Meal.class)
+        return em.createNamedQuery(Meal.BY_ID, Meal.class)
                 .setParameter("user_id", userId)
                 .setParameter("id", id)
                 .getSingleResult();
@@ -54,20 +54,18 @@ public class JpaMealRepository implements MealRepository {
     @Override
     @Transactional
     public List<Meal> getAll(int userId) {
-        List<Meal> meals = em.createQuery("SELECT m FROM Meal m JOIN FETCH m.user WHERE m.user.id=:user_id ORDER BY m.dateTime DESC", Meal.class)
+        return em.createNamedQuery(Meal.ALL, Meal.class)
                 .setParameter("user_id", userId)
                 .getResultList();
-        return meals;
     }
 
     @Override
     @Transactional
     public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
-        List<Meal> meals = em.createQuery("SELECT m FROM Meal m JOIN FETCH m.user WHERE m.user.id=:user_id AND m.dateTime BETWEEN :startDate AND :endDate ORDER BY m.dateTime DESC", Meal.class)
+        return em.createNamedQuery(Meal.BETWEEN, Meal.class)
                 .setParameter("user_id", userId)
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .getResultList();
-        return meals;
     }
 }
