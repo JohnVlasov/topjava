@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.*;
@@ -18,6 +19,8 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -32,17 +35,27 @@ import static ru.javawebinar.topjava.UserTestData.*;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(MealServiceTest.class);
+    private static final List<String> allLogs = new ArrayList<String>();
 
     @Autowired
     private MealService service;
+
+    @AfterClass
+    public static void list(){
+        allLogs.forEach(logger::info);
+    }
 
     @Rule
     public Stopwatch stopwatch = new Stopwatch() {
         @Override
         protected void finished(long nanos, Description description) {
             String testName = description.getMethodName();
-            logger.info("Test: " + testName + ", Time: " + TimeUnit.NANOSECONDS.toMillis(nanos) + " milliseconds");
+            String msg = "Test: " + testName + ", Time: " + TimeUnit.NANOSECONDS.toMillis(nanos) + " milliseconds";
+            allLogs.add(msg);
+            logger.info(msg);
+
         }
+
     };
 
     @Rule
