@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava.repository.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -9,11 +10,13 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class JdbcMealRepository implements MealRepository {
@@ -25,6 +28,15 @@ public class JdbcMealRepository implements MealRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final SimpleJdbcInsert insertMeal;
+
+    @Autowired
+    Environment environment;
+
+    @Autowired
+    public boolean isJdbcProfile() {
+        List<String> listOfProfiles = Arrays.asList(environment.getActiveProfiles());
+        return listOfProfiles.contains("jdbc");
+    }
 
     @Autowired
     public JdbcMealRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
@@ -42,8 +54,13 @@ public class JdbcMealRepository implements MealRepository {
                 .addValue("id", meal.getId())
                 .addValue("description", meal.getDescription())
                 .addValue("calories", meal.getCalories())
-                .addValue("date_time", meal.getDateTime())
                 .addValue("user_id", userId);
+
+        if (isJdbcProfile()) {
+            map.addValue("date_time", Timestamp.valueOf(meal.getDateTime()));
+        } else {
+            map.addValue("date_time", meal.getDateTime());
+        }
 
         if (meal.isNew()) {
             Number newId = insertMeal.executeAndReturnKey(map);
@@ -80,8 +97,14 @@ public class JdbcMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
-        return jdbcTemplate.query(
-                "SELECT * FROM meals WHERE user_id=?  AND date_time BETWEEN  ? AND ? ORDER BY date_time DESC",
-                ROW_MAPPER, userId, startDate, endDate);
+        if (isJdbcProfile()) {
+            return jdbcTemplate.query(
+                    "SELECT * FROM meals WHERE user_id=?  AND date_time BETWEEN  ? AND ? ORDER BY date_time DESC",
+                    ROW_MAPPER, userId, Timestamp.valueOf(startDate), Timestamp.valueOf(endDate));
+        } else {
+            return jdbcTemplate.query(
+                    "SELECT * FROM meals WHERE user_id=?  AND date_time BETWEEN  ? AND ? ORDER BY date_time DESC",
+                    ROW_MAPPER, userId, startDate, endDate);
+        }
     }
 }
