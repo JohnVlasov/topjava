@@ -18,7 +18,7 @@ import java.util.List;
 public class SpringMain {
     public static void main(String[] args) {
 
-        System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, "datajpa,postgres");
+        System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, "datajpa, postgres");
 
         try (ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml", "spring/inmemory.xml")) {
 
