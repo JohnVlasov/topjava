@@ -98,27 +98,21 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public List<User> getAll() {
 
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("SELECT user_id, role FROM user_roles");
-
-        Map<Integer, HashSet<Role>> map = new HashMap<>();
-
-        HashSet<Role> set = new HashSet<>();
+       List<Map<String, Object>> list = jdbcTemplate.queryForList("SELECT user_id, role FROM user_roles");
+        Map<Integer, Set<Role>> map = new HashMap<>();
 
         for (Map<String, Object> m : list) {
             int userId = Integer.parseInt(m.get("user_id").toString());
             Role userRole = Role.valueOf(m.get("role").toString());
-
-            if (map.get(userId) == null) {
+// не работает.....
+            if (map.get(userId) != null) {
+                Set<Role> set = map.get(userId);
                 set.add(userRole);
                 map.put(userId, set);
-
-            } else {
-                set = map.get(userId);
-                set.add(userRole);
-                map.put(userId, set);
-            }
-            set = new HashSet<>();
+                set = null;
+            } else map.putIfAbsent(userId, Set.of(userRole));
         }
+
         List<User> users = jdbcTemplate.query("SELECT * FROM users ORDER BY name, email", ROW_MAPPER);
         users.forEach(user -> user.setRoles(map.get(user.getId())));
         return users;
